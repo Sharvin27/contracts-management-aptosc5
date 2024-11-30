@@ -3,7 +3,7 @@ name = "hash_sign_01"
 version = "1.0.0"
 
 [addresses]
-HashSign="Replace_with_your_wallet_address_🔑"
+HashSign="0xebb94f2052ea45f280b0844a1b5ff344e50d231c9895ad822d845912f194c7f4"
 aptos_framework = "0x1"
 
 
