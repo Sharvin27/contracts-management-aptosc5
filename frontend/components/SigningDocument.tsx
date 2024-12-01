@@ -6,11 +6,11 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast, Toaster } from 'react-hot-toast';
 import { IoHome } from "react-icons/io5";
-import { 
-  FileText, 
-  Check, 
-  X, 
-  Clock, 
+import {
+  FileText,
+  Check,
+  X,
+  Clock,
   ExternalLink,
   PenTool,
   Shield,
@@ -102,7 +102,7 @@ const SigningPage: React.FC = () => {
     }
   };
 
-  const openIPFSFile = async(cid: string) => {
+  const openIPFSFile = async (cid: string) => {
     const ipfsUrl = `https://ipfs.io/ipfs/${cid}`;
     const response = await axios.get(ipfsUrl, { responseType: 'blob' });
     window.open(URL.createObjectURL(response.data), '_blank');
@@ -140,11 +140,12 @@ const SigningPage: React.FC = () => {
 
   const canSign = () => {
     if (!account || !document) return false;
-    return document.signers.includes(account.address) && 
+    return document.signers.includes(account.address) &&
            !document.signatures.some(sig => sig.signer === account.address) &&
            !document.is_completed;
   };
- if (loading) {
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-[#1A1B1E] flex items-center justify-center">
         <div className="space-y-4 text-center">
@@ -264,6 +265,23 @@ const SigningPage: React.FC = () => {
           )}
         </div>
 
+        {/* Signers List */}
+        <div className="mb-6">
+          <h2 className="text-xl font-bold mb-4">Signers</h2>
+          <ul className="space-y-2">
+            {document.signers.map((signer, index) => (
+              <li key={index} className="flex items-center justify-between p-3 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg">
+                <span className="truncate">{signer}</span>
+                {document.signatures.some(sig => sig.signer === signer) ? (
+                  <Check className="w-4 h-4 text-emerald-400" />
+                ) : (
+                  <X className="w-4 h-4 text-red-400" />
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+
         {/* Sign Button */}
         {canSign() ? (
           <button
@@ -286,7 +304,7 @@ const SigningPage: React.FC = () => {
         ) : (
           <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg p-4 text-center">
             <p className="text-gray-400">
-              {document.is_completed 
+              {document.is_completed
                 ? 'This document has been fully signed by all parties.'
                 : 'You are not authorized to sign this document.'}
             </p>
@@ -298,4 +316,3 @@ const SigningPage: React.FC = () => {
 };
 
 export default SigningPage;
-
