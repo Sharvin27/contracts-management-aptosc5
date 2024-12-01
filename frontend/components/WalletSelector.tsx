@@ -24,6 +24,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
+import { IoWallet } from "react-icons/io5";
+
 
 export function WalletSelector() {
   const { account, connected, disconnect, wallet } = useWallet();
@@ -52,7 +54,7 @@ export function WalletSelector() {
   return connected ? (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button>{account?.ansName || truncateAddress(account?.address) || "Unknown"}</Button>
+        <Button>{account?.ansName || truncateAddress(account?.address) || "Unknown"} <IoWallet className="text-white w-5 h-5" /></Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onSelect={copyAddress} className="gap-2">

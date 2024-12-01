@@ -4,9 +4,10 @@ import { aptosClient } from "@/utils/aptosClient";
 import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 import axios from 'axios';
 import { Modal, Button, Upload, message, Input, Tabs } from 'antd';
-import { UploadOutlined, PlusOutlined, FileTextOutlined, ShareAltOutlined } from '@ant-design/icons';
+import { UploadOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { WalletSelector } from "./WalletSelector";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { TiDocumentAdd } from "react-icons/ti";
 
 const { TabPane } = Tabs;
 
@@ -24,14 +25,8 @@ interface Document {
   is_completed: boolean;
 }
 
-interface DocumentStore {
-  documents: Document[];
-  document_counter: number;
-}
-
 export const ContractManagement: React.FC = () => {
     const { account, signAndSubmitTransaction } = useWallet();
-    const [isRegistered, setIsRegistered] = useState(false);
     const [documents, setDocuments] = useState<Document[]>([]);
     const [pendingDocuments, setPendingDocuments] = useState<Document[]>([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -43,7 +38,7 @@ export const ContractManagement: React.FC = () => {
     const moduleName = process.env.VITE_APP_MODULE_NAME
     const navigate = useNavigate();
 
-useEffect(() => {
+    useEffect(() => {
     if (account) {
       fetchDocuments();
       fetchPendingDocuments();
@@ -183,102 +178,160 @@ useEffect(() => {
       message.error("Failed to fetch the document. Please try again.");
     }
   };
-  const renderDocumentCard = (doc: Document, isPending: boolean) => (
-    <div key={doc.id} className="bg-white shadow-md rounded-lg p-6">
-      <p className="mb-2">Status: {doc.is_completed ? 'Completed' : 'Pending'}</p>
-      <p className="mb-4">Signatures: {doc.signatures.length}/{doc.signers.length}</p>
-      <div className="flex space-x-2">
-        <Button onClick={() => handleViewDocument(doc.content_hash)} type="primary" block>
-          View Document
-        </Button>
-        {isPending ? (
-          <Button type="primary" onClick={() => navigate(`/sign/${doc.id}`)} block>
-            Sign Document
+    const renderDocumentCard = (doc: Document, isPending: boolean) => (
+      <div 
+        key={doc.id} 
+        className="bg-white shadow-md rounded-lg p-4 sm:p-6 flex flex-col space-y-3 transition-all duration-300 hover:shadow-lg"
+      >
+        <div className="flex flex-col">
+          <p className="text-sm font-medium mb-1">
+            Status: <span className={doc.is_completed ? 'text-green-600' : 'text-yellow-600'}>
+              {doc.is_completed ? 'Completed' : 'Pending'}
+            </span>
+          </p>
+          <p className="text-sm text-gray-600 mb-3">
+            Signatures: {doc.signatures.length}/{doc.signers.length}
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+          <Button 
+            onClick={() => handleViewDocument(doc.content_hash)} 
+            type="primary" 
+            block
+            className="w-full sm:w-auto"
+          >
+            View Document
           </Button>
-        ) : (
-          <Button onClick={() => handleShare(doc.id)} icon={<ShareAltOutlined />} block>
-            Share
-          </Button>
-        )}
+          {isPending ? (
+            <Button 
+              type="primary" 
+              onClick={() => navigate(`/sign/${doc.id}`)} 
+              block
+              className="w-full sm:w-auto"
+            >
+              Sign Document
+            </Button>
+          ) : (
+            <Button 
+              onClick={() => handleShare(doc.id)} 
+              icon={<ShareAltOutlined />} 
+              block
+              className="w-full sm:w-auto"
+            >
+              Share
+            </Button>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
 
-  return (
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold">HashSign Dashboard</h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+    return (
+        <div className="container mx-auto px-4 py-6 sm:py-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 space-y-4 sm:space-y-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left w-full">
+              HashSign
+            </h1>
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full justify-center sm:justify-end">
               <Button
                 onClick={() => setIsModalVisible(true)}
                 type="primary"
-                icon={<PlusOutlined />}
-                size="large"
+                icon={<TiDocumentAdd className='text-white h-5 w-5' />}
+                className=" sm:w-auto"
               >
                 Create Document
               </Button>
               <WalletSelector />
-            </div>
+            </div>    
           </div>
-    
-          <Tabs defaultActiveKey="1">
+          
+          <Tabs 
+            defaultActiveKey="1" 
+            centered
+            tabBarStyle={{ marginBottom: '1rem' }}
+            className="w-full"
+          >
             <TabPane tab="Your Documents" key="1">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {documents.map(doc => renderDocumentCard(doc, false))}
+                {documents.length === 0 && (
+                  <div className="col-span-full text-center text-gray-500 py-8">
+                    No documents found. Create your first document!
+                  </div>
+                )}
               </div>
             </TabPane>
             <TabPane tab="Pending Signatures" key="2">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {pendingDocuments.map(doc => renderDocumentCard(doc, true))}
+                {pendingDocuments.length === 0 && (
+                  <div className="col-span-full text-center text-gray-500 py-8">
+                    No pending documents to sign.
+                  </div>
+                )}
               </div>
             </TabPane>
           </Tabs>
 
-      <Modal
-        title="Create New Document"
-        open={isModalVisible}
-        onOk={handleCreateDocument}
-        onCancel={() => setIsModalVisible(false)}
-        confirmLoading={transactionInProgress}
-      >
-        <Upload
-          beforeUpload={(file) => {
-            const isLt25M = file.size / 1024 / 1024 < 25;
-            if (!isLt25M) {
-              message.error('File must be smaller than 25MB!');
-            } else {
-              setFile(file);
-            }
-            return false;
-          }}
-        >
-          <Button icon={<UploadOutlined />}>Select File (Max: 25MB)</Button>
-        </Upload>
-        <Input
-          placeholder="Enter signer addresses (comma-separated)"
-          value={signers}
-          onChange={(e) => setSigners(e.target.value)}
-          className="mt-4"
-        />
-      </Modal>
+          <Modal
+            title="Create New Document"
+            open={isModalVisible}
+            onOk={handleCreateDocument}
+            onCancel={() => setIsModalVisible(false)}
+            confirmLoading={transactionInProgress}
+            className="responsive-modal"
+          >
+            <div className="flex flex-col space-y-4">
+              <Upload
+                beforeUpload={(file) => {
+                  const isLt25M = file.size / 1024 / 1024 < 25;
+                  if (!isLt25M) {
+                    message.error('File must be smaller than 25MB!');
+                  } else {
+                    setFile(file);
+                  }
+                  return false;
+                }}
+                className="w-full"
+              >
+                <Button 
+                  icon={<UploadOutlined />} 
+                  className="w-full"
+                >
+                  Select File (Max: 25MB)
+                </Button>
+              </Upload>
+              <Input
+                placeholder="Enter signer addresses (comma-separated)"
+                value={signers}
+                onChange={(e) => setSigners(e.target.value)}
+                className="w-full"
+              />
+            </div>
+          </Modal>
 
-      <Modal
-        title="View Document"
-        open={!!viewDocumentUrl}
-        onCancel={() => setViewDocumentUrl(null)}
-        footer={null}
-        width={800}
-      >
-        {viewDocumentUrl && (
-          <iframe
-            src={viewDocumentUrl}
-            style={{ width: '100%', height: '70vh', border: 'none' }}
-            title="Document Viewer"
-          />
-        )}
-      </Modal>
-    </div>
-  );
+          <Modal
+            title="View Document"
+            open={!!viewDocumentUrl}
+            onCancel={() => setViewDocumentUrl(null)}
+            footer={null}
+            width="90%"
+            className="responsive-modal"
+          >
+            {viewDocumentUrl && (
+              <iframe
+                src={viewDocumentUrl}
+                style={{ 
+                  width: '100%', 
+                  height: '70vh', 
+                  border: 'none', 
+                  maxHeight: '600px' 
+                }}
+                title="Document Viewer"
+              />
+            )}
+          </Modal>
+        </div>
+    );
 };
 
 export default ContractManagement;
