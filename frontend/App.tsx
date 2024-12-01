@@ -4,6 +4,8 @@ import { CardHeader, CardTitle } from "@/components/ui/card";
 import { WalletSelector } from "./components/WalletSelector";
 import ContractManagement from "@/components/ContractManagement";
 import SigningDocument from "@/components/SigningDocument";
+import ChatWithDocs from "@/components/ChatWithDocs";
+import Categorize from "@/components/Categorize";
 
 function App() {
   const { connected } = useWallet();
@@ -15,6 +17,8 @@ function App() {
           <Router>
             <Routes>
               <Route path="/" element={<ContractManagement />} />
+              <Route path="/chatwithdocs" element={<ChatWithDocs />} />
+              <Route path="/categorize" element={<Categorize />} />
               <Route path="/sign/:id" element={<SigningDocument />} />
             </Routes>
           </Router>
