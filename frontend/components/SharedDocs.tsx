@@ -72,7 +72,7 @@ export default function SharedDocs() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [viewingDoc, setViewingDoc] = useState<Document | null>(null);
-  const [dragActive, setDragActive] = useState(false);
+//   const [dragActive, setDragActive] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(window.innerWidth < 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [viewUrl, setViewUrl] = useState<string | null>(null);
@@ -269,26 +269,26 @@ export default function SharedDocs() {
     });
   };
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
+//   const handleDrag = (e: React.DragEvent) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+//     if (e.type === "dragenter" || e.type === "dragover") {
+//       setDragActive(true);
+//     } else if (e.type === "dragleave") {
+//       setDragActive(false);
+//     }
+//   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
+//   const handleDrop = (e: React.DragEvent) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+//     setDragActive(false);
     
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
-      setIsModalOpen(true);
-    }
-  };
+//     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+//       setFile(e.dataTransfer.files[0]);
+//       setIsModalOpen(true);
+//     }
+//   };
 
   const openIPFSFile = async(cid: string) => {
     const ipfsUrl = `https://ipfs.io/ipfs/${cid}`;
