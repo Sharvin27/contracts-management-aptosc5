@@ -4,6 +4,7 @@ import { aptosClient } from "@/utils/aptosClient";
 import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 import axios from 'axios';
 import { toast, Toaster } from 'react-hot-toast';
+import { WalletName } from '@aptos-labs/wallet-adapter-react';
 import { 
   Clock, 
   Grid,  
@@ -62,7 +63,7 @@ const STATUS_STYLES = {
 const ACTIVE_TAB_STYLES = "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 border-l-2 border-emerald-500 text-white";
 
 export default function ContractManagement() {
-  const { account, signAndSubmitTransaction, connect, disconnect, WalletName } = useWallet(); 
+  const { account, signAndSubmitTransaction, connect, disconnect } = useWallet(); 
   const [activeTab, setActiveTab] = useState('recent');
   const [isGridView, setIsGridView] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
