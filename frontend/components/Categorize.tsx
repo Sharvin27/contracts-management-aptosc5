@@ -116,10 +116,12 @@ export default function DocumentCategories() {
     }
   }, [genAI]);
 
+  console.log(documents);
+
   const fetchAndCategorizeDocuments = async () => {
     setLoading(true);
     try {
-      const response = await aptosClient().view<[Document]>({
+      const response = await aptosClient().view<[Document[]]>({
         payload: {
           function: `${moduleAddress}::${moduleName}::get_all_documents`,
           typeArguments: [],
@@ -127,8 +129,8 @@ export default function DocumentCategories() {
         }
       });
 
-      if (Array.isArray(response) && response.length > 0) {
-        const userDocuments = response[0].filter(doc => doc.creator === account.address);
+      if (Array.isArray(response) && response.length > 0 && account) {
+        const userDocuments = response[0].filter((doc: Document) => doc.creator === account.address);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const categorizedResults: Document[] = [];
 
