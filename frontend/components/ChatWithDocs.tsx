@@ -490,6 +490,246 @@
 // }
 
 
+// import React, { useState, useEffect, useRef } from 'react';
+// import { GoogleGenerativeAI } from "@google/generative-ai";
+// import { aptosClient } from "@/utils/aptosClient";
+// import { 
+//   MessageSquare, 
+//   Send, 
+//   Bot,
+//   User,
+//   Loader,
+//   FileText
+// } from 'lucide-react';
+// import axios from 'axios';
+
+// interface Document {
+//   id: number;
+//   content_hash: string;
+//   creator: string;
+//   signers: string[];
+//   signatures: string[];
+//   is_completed: boolean;
+//   category?: string;
+// }
+
+// interface ChatMessage {
+//   id: string;
+//   role: 'user' | 'ai';
+//   content: string;
+// }
+
+// export default function DocumentChat() {
+//   const [documents, setDocuments] = useState<Document[]>([]);
+//   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+//   const [userInput, setUserInput] = useState('');
+//   const [isSending, setIsSending] = useState(false);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const chatEndRef = useRef<HTMLDivElement>(null);
+
+//   const moduleAddress = import.meta.env.VITE_APP_MODULE_ADDRESS;
+//   const moduleName = import.meta.env.VITE_APP_MODULE_NAME;
+
+//   const API_KEY = "AIzaSyD6olpfeXKuZiACMF5awOE_HxOI4ifOlZM";
+  
+//   useEffect(() => {
+//     fetchDocuments();
+//   }, []);
+
+//   useEffect(() => {
+//     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+//   }, [chatMessages]);
+
+//   const fetchDocuments = async () => {
+//     setIsLoading(true);
+//     try {
+//       const response = await aptosClient().view<[Document]>({
+//         payload: {
+//           function: `${moduleAddress}::${moduleName}::get_all_documents`,
+//           typeArguments: [],
+//           functionArguments: [],
+//         }
+//       });
+
+//       if (Array.isArray(response) && response.length > 0) {
+//         // Fetch content for each document
+//         const docsWithContent = await Promise.all(
+//           response[0].map(async (doc:any) => {
+//             const content = await fetchDocumentContent(doc.content_hash);
+//             return { ...doc, content };
+//           })
+//         );
+//         setDocuments(docsWithContent);
+//       }
+//     } catch (error) {
+//       console.error("Error fetching documents:", error);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   const fetchDocumentContent = async (cid: string) => {
+//     try {
+//       const url = `https://ipfs.io/ipfs/${cid}`;
+//       const response = await axios.get(url, { responseType: 'blob' });
+//       const text = await response.data.text();
+//       return text;
+//     } catch (error) {
+//       console.error("Error fetching document content:", error);
+//       return '';
+//     }
+//   };
+
+//   const handleChat = async () => {
+//     if (!userInput.trim()) return;
+//     setIsSending(true);
+
+//     const userMessage: ChatMessage = {
+//       id: `user-${Date.now()}`,
+//       role: 'user',
+//       content: userInput
+//     };
+//     setChatMessages(prev => [...prev, userMessage]);
+//     setUserInput('');
+
+//     try {
+//       const genAI = new GoogleGenerativeAI(API_KEY);
+//       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+//       const context = documents.map(doc => 
+//         `Document ID: ${doc.id}
+//          Content Hash: ${doc.content_hash}
+//          Category: ${doc.category || 'Uncategorized'}
+//          Status: ${doc.is_completed ? 'Completed' : 'Pending'}
+//          Signatures: ${doc.signatures.length} of ${doc.signers.length}`
+//       ).join('\n\n');
+
+//       const prompt = `You are a helpful AI assistant with access to the following documents:
+
+//       ${context}
+
+//       Based on the above documents, please provide a detailed and accurate response to this query:
+//       ${userInput}
+
+//       If the query is about specific documents, reference them by their IDs and provide relevant details.
+//       If you can't find relevant information in the documents, please say so.`;
+
+//       const chatResult = await model.generateContent(prompt);
+      
+//       const aiMessage: ChatMessage = {
+//         id: `ai-${Date.now()}`,
+//         role: 'ai',
+//         content: chatResult.response.text()
+//       };
+
+//       setChatMessages(prev => [...prev, aiMessage]);
+//     } catch (err) {
+//       console.error('Chat error:', err);
+//       const errorMessage: ChatMessage = {
+//         id: `error-${Date.now()}`,
+//         role: 'ai',
+//         content: 'Sorry, I encountered an error while processing your request. Please try again.'
+//       };
+//       setChatMessages(prev => [...prev, errorMessage]);
+//     } finally {
+//       setIsSending(false);
+//     }
+//   };
+
+//   if (isLoading) {
+//     return (
+//       <div className="min-h-screen bg-[#1A1B1E] flex items-center justify-center">
+//         <div className="space-y-4 text-center">
+//           <div className="w-16 h-16 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mx-auto" />
+//           <p className="text-gray-400 animate-pulse">Loading documents...</p>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="min-h-screen bg-[#1A1B1E] text-gray-100 flex flex-col">
+//       {/* Header */}
+//       <div className="border-b border-gray-800 p-6">
+//         <div className="flex items-center justify-between">
+//           <div className="flex items-center space-x-3">
+//             <MessageSquare className="w-6 h-6 text-emerald-400" />
+//             <h1 className="text-2xl font-bold">Document Assistant</h1>
+//           </div>
+//           <div className="text-sm text-gray-400">
+//             {documents.length} documents loaded
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Chat Area */}
+//       <div className="flex-1 overflow-y-auto p-6 space-y-4">
+//         {chatMessages.length === 0 ? (
+//           <div className="text-center text-gray-400 mt-12 space-y-4">
+//             <Bot className="w-16 h-16 mx-auto text-emerald-400/50" />
+//             <div className="space-y-2">
+//               <p className="font-medium">No messages yet</p>
+//               <p className="text-sm">Ask me anything about your documents!</p>
+//             </div>
+//           </div>
+//         ) : (
+//           chatMessages.map(msg => (
+//             <div
+//               key={msg.id}
+//               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+//             >
+//               <div className={`max-w-[80%] rounded-lg p-4 flex space-x-3
+//                 ${msg.role === 'user' 
+//                   ? 'bg-emerald-500/10 border border-emerald-500/20' 
+//                   : 'bg-gray-800/50 border border-gray-700'
+//                 }`}
+//               >
+//                 {msg.role === 'ai' ? (
+//                   <Bot className="w-5 h-5 text-emerald-400 mt-1 flex-shrink-0" />
+//                 ) : (
+//                   <User className="w-5 h-5 text-emerald-400 mt-1 flex-shrink-0" />
+//                 )}
+//                 <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+//               </div>
+//             </div>
+//           ))
+//         )}
+//         <div ref={chatEndRef} />
+//       </div>
+
+//       {/* Input Area */}
+//       <div className="border-t border-gray-800 p-4">
+//         <form 
+//           onSubmit={(e) => {
+//             e.preventDefault();
+//             handleChat();
+//           }}
+//           className="flex space-x-2"
+//         >
+//           <input
+//             type="text"
+//             value={userInput}
+//             onChange={(e) => setUserInput(e.target.value)}
+//             placeholder="Ask about your documents..."
+//             className="flex-1 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:border-emerald-500 outline-none transition-colors"
+//           />
+//           <button
+//             type="submit"
+//             disabled={isSending || !userInput.trim()}
+//             className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+//           >
+//             {isSending ? (
+//               <Loader className="w-4 h-4 animate-spin" />
+//             ) : (
+//               <Send className="w-4 h-4" />
+//             )}
+//           </button>
+//         </form>
+//       </div>
+//     </div>
+//   );
+// }
+
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { aptosClient } from "@/utils/aptosClient";
@@ -499,9 +739,13 @@ import {
   Bot,
   User,
   Loader,
-  FileText
+  FileText,
+  AlertCircle
 } from 'lucide-react';
 import axios from 'axios';
+import { toast, Toaster } from 'react-hot-toast';
+import "@/index.css"
+import { useWallet } from '@aptos-labs/wallet-adapter-react';
 
 interface Document {
   id: number;
@@ -511,6 +755,8 @@ interface Document {
   signatures: string[];
   is_completed: boolean;
   category?: string;
+  extractedContent?: string;
+  signerDetails?: string;
 }
 
 interface ChatMessage {
@@ -519,28 +765,139 @@ interface ChatMessage {
   content: string;
 }
 
+interface ProcessedDocument {
+  id: number;
+  summary: string;
+  signerInfo: string;
+  category: string;
+  status: string;
+}
+
 export default function DocumentChat() {
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [processedDocs, setProcessedDocs] = useState<ProcessedDocument[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [userInput, setUserInput] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [genAI, setGenAI] = useState<any>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const { account } = useWallet();
 
   const moduleAddress = import.meta.env.VITE_APP_MODULE_ADDRESS;
   const moduleName = import.meta.env.VITE_APP_MODULE_NAME;
-
   const API_KEY = "AIzaSyD6olpfeXKuZiACMF5awOE_HxOI4ifOlZM";
+
+  // Initialize Gemini AI
+  useEffect(() => {
+    const ai = new GoogleGenerativeAI(API_KEY);
+    setGenAI(ai);
+  }, []);
   
   useEffect(() => {
-    fetchDocuments();
-  }, []);
+    if (genAI) {
+      fetchAndProcessDocuments();
+    }
+  }, [genAI]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
 
-  const fetchDocuments = async () => {
+  const analyzeDocument = async (content: string | Blob, model: any): Promise<string> => {
+    try {
+      let textContent = '';
+      const reader = new FileReader();
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        reader.readAsDataURL(content as Blob);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+      });
+
+      const base64Content = base64Data.split(',')[1];
+      const fileType = (content as Blob).type;
+
+      if (fileType.includes('image')) {
+        const result = await model.generateContent({
+          contents: [{
+            role: 'user',
+            parts: [
+              { text: "Analyze this image and provide a detailed summary of its content, including any visible text, key information, and important details." },
+              { inlineData: { mimeType: fileType, data: base64Content }}
+            ]
+          }]
+        });
+        textContent = result.response.text();
+      } else {
+        const result = await model.generateContent({
+          contents: [{
+            role: 'user',
+            parts: [
+              { text: "Provide a comprehensive summary of this document's content, highlighting key points, important details, and any significant information." },
+              { inlineData: { mimeType: fileType, data: base64Content }}
+            ]
+          }]
+        });
+        textContent = result.response.text();
+      }
+      return textContent;
+    } catch (error) {
+      console.error('Error analyzing document:', error);
+      return 'Error analyzing document content';
+    }
+  };
+
+  // const fetchAndProcessDocuments = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const response = await aptosClient().view<[Document]>({
+  //       payload: {
+  //         function: `${moduleAddress}::${moduleName}::get_all_documents`,
+  //         typeArguments: [],
+  //         functionArguments: [],
+  //       }
+  //     });
+
+  //     if (Array.isArray(response) && response.length > 0) {
+  //       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  //       const processedDocuments: ProcessedDocument[] = [];
+
+  //       for (const doc of response[0]) {
+  //         try {
+  //           // Fetch and analyze document content
+  //           const content = await axios.get(`https://gateway.pinata.cloud/ipfs/${doc.content_hash}`, {
+  //             responseType: 'blob'
+  //           });
+            
+  //           const summary = await analyzeDocument(content.data, model);
+            
+  //           // Get signer information
+  //           const signerInfo = `Signers: ${doc.signers.join(', ')}\nSignatures Completed: ${doc.signatures.length}/${doc.signers.length}`;
+            
+  //           processedDocuments.push({
+  //             id: doc.id,
+  //             summary,
+  //             signerInfo,
+  //             category: doc.category || 'uncategorized',
+  //             status: doc.is_completed ? 'completed' : 'pending'
+  //           });
+  //         } catch (error) {
+  //           console.error(`Error processing document ${doc.id}:`, error);
+  //         }
+  //       }
+
+  //       setProcessedDocs(processedDocuments);
+  //       setDocuments(response[0]);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching documents:", error);
+  //     toast.error("Failed to load documents");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  const fetchAndProcessDocuments = async () => {
     setIsLoading(true);
     try {
       const response = await aptosClient().view<[Document]>({
@@ -550,33 +907,46 @@ export default function DocumentChat() {
           functionArguments: [],
         }
       });
-
+  
       if (Array.isArray(response) && response.length > 0) {
-        // Fetch content for each document
-        const docsWithContent = await Promise.all(
-          response[0].map(async (doc:any) => {
-            const content = await fetchDocumentContent(doc.content_hash);
-            return { ...doc, content };
-          })
-        );
-        setDocuments(docsWithContent);
+        // Filter documents created by the connected account
+        const userDocuments = response[0].filter(doc => doc.creator === account.address);
+        
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const processedDocuments: ProcessedDocument[] = [];
+  
+        for (const doc of userDocuments) {  // Process only user's documents
+          try {
+            // Fetch and analyze document content
+            const content = await axios.get(`https://gateway.pinata.cloud/ipfs/${doc.content_hash}`, {
+              responseType: 'blob'
+            });
+            
+            const summary = await analyzeDocument(content.data, model);
+            
+            // Get signer information
+            const signerInfo = `Signers: ${doc.signers.join(', ')}\nSignatures Completed: ${doc.signatures.length}/${doc.signers.length}`;
+            
+            processedDocuments.push({
+              id: doc.id,
+              summary,
+              signerInfo,
+              category: doc.category || 'uncategorized',
+              status: doc.is_completed ? 'completed' : 'pending'
+            });
+          } catch (error) {
+            console.error(`Error processing document ${doc.id}:`, error);
+          }
+        }
+  
+        setProcessedDocs(processedDocuments);
+        setDocuments(userDocuments);  // Store only user's documents
       }
     } catch (error) {
       console.error("Error fetching documents:", error);
+      toast.error("Failed to load documents");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const fetchDocumentContent = async (cid: string) => {
-    try {
-      const url = `https://ipfs.io/ipfs/${cid}`;
-      const response = await axios.get(url, { responseType: 'blob' });
-      const text = await response.data.text();
-      return text;
-    } catch (error) {
-      console.error("Error fetching document content:", error);
-      return '';
     }
   };
 
@@ -593,26 +963,31 @@ export default function DocumentChat() {
     setUserInput('');
 
     try {
-      const genAI = new GoogleGenerativeAI(API_KEY);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-      const context = documents.map(doc => 
+      // Create detailed context with document summaries and signer info
+      const context = processedDocs.map(doc => 
         `Document ID: ${doc.id}
-         Content Hash: ${doc.content_hash}
-         Category: ${doc.category || 'Uncategorized'}
-         Status: ${doc.is_completed ? 'Completed' : 'Pending'}
-         Signatures: ${doc.signatures.length} of ${doc.signers.length}`
-      ).join('\n\n');
+         Summary: ${doc.summary}
+         ${doc.signerInfo}
+         Category: ${doc.category}
+         Status: ${doc.status}`
+      ).join('\n\n==========\n\n');
 
-      const prompt = `You are a helpful AI assistant with access to the following documents:
+      const prompt = `You are an AI assistant with detailed knowledge of these documents:
 
       ${context}
 
-      Based on the above documents, please provide a detailed and accurate response to this query:
-      ${userInput}
+      User Query: "${userInput}"
 
-      If the query is about specific documents, reference them by their IDs and provide relevant details.
-      If you can't find relevant information in the documents, please say so.`;
+      Instructions for response:
+      1. If the query is about specific documents, reference them by ID and provide relevant details
+      2. Include relevant signer information when discussing document status
+      3. If the query relates to multiple documents, compare and contrast them
+      4. If you can't find relevant information, clearly state that
+      5. Be specific and cite document IDs when providing information
+
+      Please provide a detailed and accurate response:`;
 
       const chatResult = await model.generateContent(prompt);
       
@@ -641,7 +1016,7 @@ export default function DocumentChat() {
       <div className="min-h-screen bg-[#1A1B1E] flex items-center justify-center">
         <div className="space-y-4 text-center">
           <div className="w-16 h-16 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mx-auto" />
-          <p className="text-gray-400 animate-pulse">Loading documents...</p>
+          <p className="text-gray-400 animate-pulse">Loading and analyzing documents...</p>
         </div>
       </div>
     );
@@ -649,6 +1024,7 @@ export default function DocumentChat() {
 
   return (
     <div className="min-h-screen bg-[#1A1B1E] text-gray-100 flex flex-col">
+      <Toaster />
       {/* Header */}
       <div className="border-b border-gray-800 p-6">
         <div className="flex items-center justify-between">
@@ -656,8 +1032,15 @@ export default function DocumentChat() {
             <MessageSquare className="w-6 h-6 text-emerald-400" />
             <h1 className="text-2xl font-bold">Document Assistant</h1>
           </div>
-          <div className="text-sm text-gray-400">
-            {documents.length} documents loaded
+          <div className="flex items-center space-x-4">
+            <div className="text-sm text-gray-400">
+              {documents.length} documents analyzed
+            </div>
+            {processedDocs.length > 0 && (
+              <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs">
+                Ready to assist
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -668,15 +1051,15 @@ export default function DocumentChat() {
           <div className="text-center text-gray-400 mt-12 space-y-4">
             <Bot className="w-16 h-16 mx-auto text-emerald-400/50" />
             <div className="space-y-2">
-              <p className="font-medium">No messages yet</p>
-              <p className="text-sm">Ask me anything about your documents!</p>
+              <p className="font-medium">Ready to assist with your documents</p>
+              <p className="text-sm">Ask me about document contents, signers, or status!</p>
             </div>
           </div>
         ) : (
           chatMessages.map(msg => (
             <div
               key={msg.id}
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom`}
             >
               <div className={`max-w-[80%] rounded-lg p-4 flex space-x-3
                 ${msg.role === 'user' 
@@ -710,7 +1093,7 @@ export default function DocumentChat() {
             type="text"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
-            placeholder="Ask about your documents..."
+            placeholder="Ask about document contents, signers, or status..."
             className="flex-1 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:border-emerald-500 outline-none transition-colors"
           />
           <button
