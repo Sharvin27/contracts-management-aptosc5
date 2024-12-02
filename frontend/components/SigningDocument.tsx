@@ -301,7 +301,7 @@ const SigningPage: React.FC = () => {
           <button
             onClick={handleSignDocument}
             disabled={signing}
-            className="w-full md:w-auto px-8 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            className="w-full md:w-auto my-2 px-8 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
             {signing ? (
               <>
@@ -310,8 +310,8 @@ const SigningPage: React.FC = () => {
               </>
             ) : (
               <>
-                <PenTool className="w-4 h-4" />
-                <span className='my-2'>Sign Document</span>
+                  <PenTool className="w-4 h-4" />
+                  <span className=''>Sign Document</span>
               </>
             )}
           </button>
