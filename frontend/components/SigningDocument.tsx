@@ -311,7 +311,7 @@ const SigningPage: React.FC = () => {
             ) : (
               <>
                 <PenTool className="w-4 h-4" />
-                <span>Sign Document</span>
+                <span className='my-2'>Sign Document</span>
               </>
             )}
           </button>

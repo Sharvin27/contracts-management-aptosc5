@@ -112,10 +112,12 @@ export default function ContractManagement() {
         }
       });
 
+
       if (Array.isArray(response) && response.length > 0 && account) {
         const userDocuments = response[0].filter(
-          doc => doc.creator === account.address
+          doc => doc.creator === account.address || doc.signers.includes(account.address)
         );
+        console.log(userDocuments)
         setDocuments(userDocuments);
       } else {
         setDocuments([]);
