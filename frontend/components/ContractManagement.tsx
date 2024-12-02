@@ -4,7 +4,7 @@ import { aptosClient } from "@/utils/aptosClient";
 import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 import axios from 'axios';
 import { toast, Toaster } from 'react-hot-toast';
-import { WalletName } from '@aptos-labs/wallet-adapter-react';
+import {WalletName}  from '@aptos-labs/wallet-adapter-react';
 import { 
   Clock, 
   Grid,  
@@ -434,7 +434,7 @@ export default function ContractManagement() {
               </div>
               {!account ? (
                 <button 
-                  onClick={() => connect(WalletName)}
+                  onClick={() => connect("Petra" as WalletName<"Petra">)}
                   className="px-4 md:px-6 py-2 text-sm md:text-base rounded-lg bg-emerald-500 hover:bg-emerald-600 transition-colors"
                 >
                   Connect
