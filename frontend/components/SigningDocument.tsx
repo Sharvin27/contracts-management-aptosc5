@@ -204,7 +204,7 @@ const SigningPage: React.FC = () => {
           </div>
           <button
             onClick={() => navigate('/')}
-            className="px-4 py-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-sm self-start md:self-auto flex text-base"
+            className="px-4 py-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors self-start md:self-auto flex text-base"
           >
             <IoHome className='w-5 h-5 mx-2 ' /> Return to Dashboard
           </button>

@@ -379,7 +379,7 @@ export default function ContractManagement() {
 
           <nav className="flex-1 px-4 space-y-1">
             {[
-              { id: 'Home', icon: <Clock className="w-4 h-4" />, label: 'Home' },
+              { id: 'Home', icon: <Clock className="w-4 h-4" />, label: 'Home', path: '/' },
               { id: 'Categorized', icon: <Grid className="w-4 h-4" />, label: 'Categorized', path: '/categorize' },
               { id: 'Shared', icon: <Share2 className="w-4 h-4" />, label: 'Shared',path: '/shared-docs' },
               { id: 'Trash', icon: <Trash2 className="w-4 h-4" />, label: 'Trash' },
