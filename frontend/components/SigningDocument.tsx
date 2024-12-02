@@ -63,6 +63,12 @@ const SigningPage: React.FC = () => {
     }
   }, [id]);
 
+  // Add a helper function to format timestamps
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(Number(timestamp) / 1000); // Convert microseconds to milliseconds
+    return date.toLocaleString(); // Or use more specific formatting like date.toLocaleString('en-US', options)
+  };
+
   const fetchDocument = async (docId: number) => {
     setLoading(true);
     try {
@@ -265,23 +271,31 @@ const SigningPage: React.FC = () => {
           )}
         </div>
 
-        {/* Signers List */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold mb-4">Signers</h2>
-          <ul className="space-y-2">
-            {document.signers.map((signer, index) => (
-              <li key={index} className="flex items-center justify-between p-3 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg">
-                <span className="truncate">{signer}</span>
-                {document.signatures.some(sig => sig.signer === signer) ? (
+        <ul className="space-y-2">
+          {document.signers.map((signer, index) => {
+            const signature = document.signatures.find(sig => sig.signer === signer);
+            return (
+              <li 
+                key={index} 
+                className="flex items-center justify-between p-3 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg"
+              >
+                <div className="flex flex-col">
+                  <span className="truncate">{signer}</span>
+                  {signature && (
+                    <span className="text-xs text-gray-400">
+                      Signed: {formatTimestamp(signature.timestamp)}
+                    </span>
+                  )}
+                </div>
+                {signature ? (
                   <Check className="w-4 h-4 text-emerald-400" />
                 ) : (
                   <X className="w-4 h-4 text-red-400" />
                 )}
               </li>
-            ))}
-          </ul>
-        </div>
-
+            );
+          })}
+        </ul>
         {/* Sign Button */}
         {canSign() ? (
           <button
@@ -302,7 +316,7 @@ const SigningPage: React.FC = () => {
             )}
           </button>
         ) : (
-          <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg p-4 text-center">
+          <div className="bg-gray-800/50 backdrop-blur-sm border border-emerald-400 rounded-lg p-4 text-center my-2">
             <p className="text-gray-400">
               {document.is_completed
                 ? 'This document has been fully signed by all parties.'
