@@ -730,7 +730,7 @@
 //   );
 // }
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { aptosClient } from "@/utils/aptosClient";
 import { 
@@ -739,8 +739,6 @@ import {
   Bot,
   User,
   Loader,
-  FileText,
-  AlertCircle
 } from 'lucide-react';
 import axios from 'axios';
 import { toast, Toaster } from 'react-hot-toast';
@@ -847,60 +845,12 @@ export default function DocumentChat() {
     }
   };
 
-  // const fetchAndProcessDocuments = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const response = await aptosClient().view<[Document]>({
-  //       payload: {
-  //         function: `${moduleAddress}::${moduleName}::get_all_documents`,
-  //         typeArguments: [],
-  //         functionArguments: [],
-  //       }
-  //     });
-
-  //     if (Array.isArray(response) && response.length > 0) {
-  //       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  //       const processedDocuments: ProcessedDocument[] = [];
-
-  //       for (const doc of response[0]) {
-  //         try {
-  //           // Fetch and analyze document content
-  //           const content = await axios.get(`https://gateway.pinata.cloud/ipfs/${doc.content_hash}`, {
-  //             responseType: 'blob'
-  //           });
-            
-  //           const summary = await analyzeDocument(content.data, model);
-            
-  //           // Get signer information
-  //           const signerInfo = `Signers: ${doc.signers.join(', ')}\nSignatures Completed: ${doc.signatures.length}/${doc.signers.length}`;
-            
-  //           processedDocuments.push({
-  //             id: doc.id,
-  //             summary,
-  //             signerInfo,
-  //             category: doc.category || 'uncategorized',
-  //             status: doc.is_completed ? 'completed' : 'pending'
-  //           });
-  //         } catch (error) {
-  //           console.error(`Error processing document ${doc.id}:`, error);
-  //         }
-  //       }
-
-  //       setProcessedDocs(processedDocuments);
-  //       setDocuments(response[0]);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching documents:", error);
-  //     toast.error("Failed to load documents");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+  
 
   const fetchAndProcessDocuments = async () => {
     setIsLoading(true);
     try {
-      const response = await aptosClient().view<[Document]>({
+      const response = await aptosClient().view<[Document[]]>({
         payload: {
           function: `${moduleAddress}::${moduleName}::get_all_documents`,
           typeArguments: [],
@@ -908,7 +858,7 @@ export default function DocumentChat() {
         }
       });
   
-      if (Array.isArray(response) && response.length > 0) {
+      if (Array.isArray(response) && response.length > 0 && account) {
         // Filter documents created by the connected account
         const userDocuments = response[0].filter(doc => doc.creator === account.address);
         
