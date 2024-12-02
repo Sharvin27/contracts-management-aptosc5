@@ -51,7 +51,7 @@ const features = [
 
 function App() {
   const { connected } = useWallet();
-  const [isHovering, setIsHovering] = useState(null);
+  const [isHovering, setIsHovering] = useState<number | null>(null);
 
   return (
     <div className="relative min-h-screen bg-[#030712] antialiased overflow-hidden">
@@ -84,51 +84,51 @@ function App() {
             >
               {/* Title with enhanced glow */}
               {/* Title and tagline with enhanced gradients */}
-<div className="relative mb-16 group">
-  {/* Upper gradient line */}
-  <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
-  
-  <motion.div
-    initial={{ scale: 0.9, opacity: 0 }}
-    animate={{ scale: 1, opacity: 1 }}
-    className="relative"
-  >
-    <h1 className="text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-200 via-emerald-400 to-emerald-200">
-      DecryptDocs
-    </h1>
-    <div className="absolute -inset-x-16 -inset-y-8 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-  </motion.div>
-  
-  <motion.div 
-    initial={{ y: 20, opacity: 0 }}
-    animate={{ y: 0, opacity: 1 }}
-    transition={{ delay: 0.2 }}
-    className="relative mt-8"
-  >
-        <div className="flex items-center justify-center gap-6 text-xl text-emerald-100/80 font-light">
-          <span className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-emerald-400" />
-            Store
-          </span>
-          <span className="text-emerald-400/50">•</span>
-          <span className="flex items-center gap-2">
-            <Share className="w-5 h-5 text-emerald-400" />
-            Share
-          </span>
-          <span className="text-emerald-400/50">•</span>
-          <span className="flex items-center gap-2">
-            <Search className="w-5 h-5 text-emerald-400" />
-            Search
-          </span>
-        </div>
-        <p className="mt-6 text-emerald-100/60 text-lg font-light">
-          Your Decentralized Document Hub for the Web3 Era
-        </p>
-    </motion.div>
+              <div className="relative mb-16 group">
+      {/* Upper gradient line */}
+      <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
+      
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="relative"
+      >
+        <h1 className="text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-200 via-emerald-400 to-emerald-200">
+          DecryptDocs
+        </h1>
+        <div className="absolute -inset-x-16 -inset-y-8 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+      </motion.div>
+      
+      <motion.div 
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="relative mt-8"
+      >
+            <div className="flex items-center justify-center gap-6 text-xl text-emerald-100/80 font-light">
+              <span className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-emerald-400" />
+                Store
+              </span>
+              <span className="text-emerald-400/50">•</span>
+              <span className="flex items-center gap-2">
+                <Share className="w-5 h-5 text-emerald-400" />
+                Share
+              </span>
+              <span className="text-emerald-400/50">•</span>
+              <span className="flex items-center gap-2">
+                <Search className="w-5 h-5 text-emerald-400" />
+                Search
+              </span>
+            </div>
+            <p className="mt-6 text-emerald-100/60 text-lg font-light">
+              Your Decentralized Document Hub for the Web3 Era
+            </p>
+        </motion.div>
 
-          {/* Lower gradient line */}
-          <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
-          </div>
+              {/* Lower gradient line */}
+              <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
+              </div>
               {/* Enhanced glassmorphism wallet card */}
               <motion.div
                 initial={{ y: 20, opacity: 0 }}

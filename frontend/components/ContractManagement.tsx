@@ -17,6 +17,7 @@ import {
   Menu,
   Eye,
   Bot,
+  Send,
   ExternalLink, 
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -77,6 +78,8 @@ export default function ContractManagement() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [viewUrl, setViewUrl] = useState<string | null>(null);
   const [signersList, setSignersList] = useState<Signer[]>([{ address: '' }]);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const moduleAddress = process.env.VITE_APP_MODULE_ADDRESS;
   const moduleName = process.env.VITE_APP_MODULE_NAME;
@@ -290,6 +293,56 @@ export default function ContractManagement() {
     }
   };
 
+  const automaticSign = async (documentId: number) => {
+    if (!account) return;
+    setIsProcessing(true);
+    
+    try {
+      const payload: InputTransactionData = {
+        data: {
+          function: `${moduleAddress}::${moduleName}::sign_document`,
+          functionArguments: [documentId],
+        }
+      };
+      await signAndSubmitTransaction(payload);
+      toast.custom((_t) => (
+        <div className="bg-gray-800 text-white px-6 py-4 shadow-xl rounded-lg border border-gray-700">
+          <div className="flex items-center space-x-3">
+            <Bot className="w-5 h-5 text-emerald-400" />
+            <p>AI successfully signed document {documentId}</p>
+          </div>
+        </div>
+      ));
+      fetchUserDocuments();
+    } catch (error) {
+      console.error('Signing failed:', error);
+      toast.error('Failed to sign document');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const executePrompt = async () => {
+    if (!aiPrompt.trim()) return;
+    setIsProcessing(true);
+
+    try {
+      const documentIdMatch = aiPrompt.match(/\d+/);
+      if (documentIdMatch && aiPrompt.toLowerCase().includes('sign')) {
+        const documentId = parseInt(documentIdMatch[0]);
+        await automaticSign(documentId);
+      } else {
+        toast.error("Could not understand the command");
+      }
+    } catch (error) {
+      console.error("Error executing prompt:", error);
+      toast.error("Failed to process AI request");
+    } finally {
+      setIsProcessing(false);
+      setAiPrompt('');
+    }
+  };
+
   const openIPFSFile = async(cid: string) => {
     const ipfsUrl = `https://ipfs.io/ipfs/${cid}`;
     const response = await axios.get(ipfsUrl, { responseType: 'blob' });
@@ -415,6 +468,26 @@ export default function ContractManagement() {
             >
               <Upload className="w-4 h-4" />
               {!isSidebarCollapsed && <span>Upload</span>}
+            </button>
+          </div>
+          <div className="flex flex-col md:flex-row items-center w-full max-w-md mx-auto mb-2 px-2">
+            <input
+              type="text"
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="Ask AI to help..."
+              className="flex-1 px-3 py-2 bg-gray-800 rounded-lg border border-gray-700 focus:border-emerald-500 outline-none text-sm w-full md:w-auto"
+            />
+            <button
+              onClick={executePrompt}
+              disabled={isProcessing || !aiPrompt.trim()}
+              className="p-2 bg-emerald-500 rounded-lg hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed mt-2 md:mt-0 md:ml-2"
+            >
+              {isProcessing ? (
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
             </button>
           </div>
         </div>
