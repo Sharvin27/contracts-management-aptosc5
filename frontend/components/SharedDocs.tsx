@@ -1,4 +1,4 @@
- import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { aptosClient } from "@/utils/aptosClient";
 import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
@@ -62,7 +62,7 @@ const STATUS_STYLES = {
 
 const ACTIVE_TAB_STYLES = "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 border-l-2 border-emerald-500 text-white";
 
-export default function ContractManagement() {
+export default function SharedDocs() {
   const { account, signAndSubmitTransaction, connect, disconnect } = useWallet(); 
   const [activeTab, setActiveTab] = useState('recent');
   const [isGridView, setIsGridView] = useState(true);
@@ -115,7 +115,7 @@ export default function ContractManagement() {
 
       if (Array.isArray(response) && response.length > 0 && account) {
         const userDocuments = response[0].filter(
-          doc => doc.creator === account.address || doc.signers.includes(account.address)
+          doc =>  doc.signers.includes(account.address)
         );
         console.log(userDocuments)
         setDocuments(userDocuments);
@@ -379,9 +379,9 @@ export default function ContractManagement() {
 
           <nav className="flex-1 px-4 space-y-1">
             {[
-              { id: 'Home', icon: <Clock className="w-4 h-4" />, label: 'Home' },
+              { id: 'Home', icon: <Clock className="w-4 h-4" />, label: 'Home',path: '/' },
               { id: 'Categorized', icon: <Grid className="w-4 h-4" />, label: 'Categorized', path: '/categorize' },
-              { id: 'Shared', icon: <Share2 className="w-4 h-4" />, label: 'Shared',path: '/shared-docs' },
+              { id: 'Shared', icon: <Share2 className="w-4 h-4" />, label: 'Shared' },
               { id: 'Trash', icon: <Trash2 className="w-4 h-4" />, label: 'Trash' },
               { id: 'bot', icon: <Bot className="w-4 h-4" />, label: 'Talk-2-Docs', path: '/chatwithdocs' }
             ].map((item) => (
@@ -459,35 +459,6 @@ export default function ContractManagement() {
 
           {/* Content Area */}
           <div className="p-4 md:p-6 space-y-6">
-            {/* Upload Area */}
-            <div 
-              className={`border-2 border-dashed rounded-xl p-6 md:p-12 text-center transition-colors
-                ${dragActive ? 'border-emerald-500 bg-emerald-500/10' : 'border-gray-700 hover:border-gray-600'}`}
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
-            >
-              <p className="text-gray-400 mb-2 text-sm md:text-base">Drag and drop your files here</p>
-              <p className="text-gray-500 text-xs md:text-sm mb-4">OR</p>
-              <button 
-                onClick={() => document.getElementById('file-input')?.click()}
-                className="px-4 md:px-6 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors text-sm md:text-base"
-              >
-                Browse
-              </button>
-              <input
-                id="file-input"
-                type="file"
-                className="hidden"
-                onChange={(e) => {
-                  if (e.target.files?.[0]) {
-                    setFile(e.target.files[0]);
-                    setIsModalOpen(true);
-                  }
-                }}
-              />
-            </div>
             {/* Statistics Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {/* Signed Documents */}
@@ -588,127 +559,127 @@ export default function ContractManagement() {
           </div>
         </div>
       </div>
-{/* Enhanced Upload Modal */}
-{isModalOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setIsModalOpen(false);
-          }}
-        >
-          <div 
-            className="bg-gray-900 rounded-xl w-full max-w-md animate-in zoom-in-95 duration-200"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="border-b border-gray-800">
-              <div className="flex justify-between items-center p-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                    <Upload className="w-5 h-5 text-emerald-400" />
-                  </div>
-                  <h3 className="text-xl font-semibold">Upload Document</h3>
-                </div>
-                <button 
-                  onClick={() => setIsModalOpen(false)}
-                  className="p-2 rounded-lg hover:bg-gray-800 transition-colors group"
-                >
-                  <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                </button>
-              </div>
-            </div>
-            
-            <div className="p-6 space-y-6">
-              {/* File Upload Section */}
-              <div 
-                className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 
-                  ${file ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-gray-700 hover:border-gray-600'}`}
-              >
-                {file ? (
-                  <div className="space-y-2">
-                    <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center mx-auto">
-                      <FileText className="w-6 h-6 text-emerald-400" />
+    {/* Enhanced Upload Modal */}
+    {isModalOpen && (
+            <div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            onClick={(e) => {
+                if (e.target === e.currentTarget) setIsModalOpen(false);
+            }}
+            >
+            <div 
+                className="bg-gray-900 rounded-xl w-full max-w-md animate-in zoom-in-95 duration-200"
+                onClick={e => e.stopPropagation()}
+            >
+                <div className="border-b border-gray-800">
+                <div className="flex justify-between items-center p-6">
+                    <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                        <Upload className="w-5 h-5 text-emerald-400" />
                     </div>
-                    <p className="font-medium truncate">{file.name}</p>
-                    <p className="text-sm text-gray-400">
-                      {(file.size / (1024 * 1024)).toFixed(2)} MB
-                    </p>
+                    <h3 className="text-xl font-semibold">Upload Document</h3>
+                    </div>
                     <button 
-                      onClick={() => setFile(null)}
-                      className="text-sm text-red-400 hover:text-red-300 transition-colors"
+                    onClick={() => setIsModalOpen(false)}
+                    className="p-2 rounded-lg hover:bg-gray-800 transition-colors group"
                     >
-                      Remove file
+                    <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
                     </button>
-                  </div>
-                ) : (
-                  <div
-                    onClick={() => document.getElementById('modal-file-input')?.click()}
-                    className="cursor-pointer space-y-2"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center mx-auto">
-                      <Upload className="w-6 h-6 text-gray-400" />
-                    </div>
-                    <p className="text-gray-400">Drop your file here or click to browse</p>
-                    <p className="text-xs text-gray-500">Maximum file size: 25MB</p>
-                  </div>
-                )}
-                <input
-                  id="modal-file-input"
-                  type="file"
-                  className="hidden"
-                  onChange={(e) => {
-                    const selectedFile = e.target.files?.[0];
-                    if (selectedFile && selectedFile.size <= 25 * 1024 * 1024) {
-                      setFile(selectedFile);
-                    } else {
-                      toast.error("File size must be less than 25MB");
-                    }
-                  }}
-                />
-              </div>
-
-              {/* Signers Section */}
-              <div className="space-y-3">
-                <label className="text-sm font-medium text-gray-300">Signers</label>
-                <div className="space-y-2">
-                  {signersList.map((signer, index) => (
-                    <div 
-                      key={index}
-                      className="group flex items-center space-x-2 animate-in slide-in-from-left duration-200"
-                      style={{ animationDelay: `${index * 50}ms` }}
-                    >
-                      <input
-                        type="text"
-                        value={signer.address}
-                        onChange={(e) => {
-                          const newList = [...signersList];
-                          newList[index].address = e.target.value;
-                          setSignersList(newList);
-                        }}
-                        placeholder="Enter signer address"
-                        className="flex-1 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:border-emerald-500 outline-none transition-colors text-sm"
-                      />
-                      {signersList.length > 1 && (
-                        <button
-                          onClick={() => {
-                            const newList = signersList.filter((_, i) => i !== index);
-                            setSignersList(newList);
-                          }}
-                          className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
                 </div>
-                <button
-                  onClick={() => setSignersList([...signersList, { address: '' }])}
-                  className="w-full px-4 py-2 rounded-lg border border-dashed border-gray-700 hover:border-emerald-500 text-gray-400 hover:text-emerald-400 transition-all text-sm focus:outline-none"
+                </div>
+                
+                <div className="p-6 space-y-6">
+                {/* File Upload Section */}
+                <div 
+                    className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 
+                    ${file ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-gray-700 hover:border-gray-600'}`}
                 >
-                  + Add another signer
-                </button>
-              </div>
-            </div>
+                    {file ? (
+                    <div className="space-y-2">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center mx-auto">
+                        <FileText className="w-6 h-6 text-emerald-400" />
+                        </div>
+                        <p className="font-medium truncate">{file.name}</p>
+                        <p className="text-sm text-gray-400">
+                        {(file.size / (1024 * 1024)).toFixed(2)} MB
+                        </p>
+                        <button 
+                        onClick={() => setFile(null)}
+                        className="text-sm text-red-400 hover:text-red-300 transition-colors"
+                        >
+                        Remove file
+                        </button>
+                    </div>
+                    ) : (
+                    <div
+                        onClick={() => document.getElementById('modal-file-input')?.click()}
+                        className="cursor-pointer space-y-2"
+                    >
+                        <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center mx-auto">
+                        <Upload className="w-6 h-6 text-gray-400" />
+                        </div>
+                        <p className="text-gray-400">Drop your file here or click to browse</p>
+                        <p className="text-xs text-gray-500">Maximum file size: 25MB</p>
+                    </div>
+                    )}
+                    <input
+                    id="modal-file-input"
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => {
+                        const selectedFile = e.target.files?.[0];
+                        if (selectedFile && selectedFile.size <= 25 * 1024 * 1024) {
+                        setFile(selectedFile);
+                        } else {
+                        toast.error("File size must be less than 25MB");
+                        }
+                    }}
+                    />
+                </div>
+
+                {/* Signers Section */}
+                <div className="space-y-3">
+                    <label className="text-sm font-medium text-gray-300">Signers</label>
+                    <div className="space-y-2">
+                    {signersList.map((signer, index) => (
+                        <div 
+                        key={index}
+                        className="group flex items-center space-x-2 animate-in slide-in-from-left duration-200"
+                        style={{ animationDelay: `${index * 50}ms` }}
+                        >
+                        <input
+                            type="text"
+                            value={signer.address}
+                            onChange={(e) => {
+                            const newList = [...signersList];
+                            newList[index].address = e.target.value;
+                            setSignersList(newList);
+                            }}
+                            placeholder="Enter signer address"
+                            className="flex-1 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:border-emerald-500 outline-none transition-colors text-sm"
+                        />
+                        {signersList.length > 1 && (
+                            <button
+                            onClick={() => {
+                                const newList = signersList.filter((_, i) => i !== index);
+                                setSignersList(newList);
+                            }}
+                            className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                            >
+                            <X className="w-4 h-4" />
+                            </button>
+                        )}
+                        </div>
+                    ))}
+                    </div>
+                    <button
+                    onClick={() => setSignersList([...signersList, { address: '' }])}
+                    className="w-full px-4 py-2 rounded-lg border border-dashed border-gray-700 hover:border-emerald-500 text-gray-400 hover:text-emerald-400 transition-all text-sm focus:outline-none"
+                    >
+                    + Add another signer
+                    </button>
+                </div>
+                </div>
 
             {/* Actions */}
             <div className="border-t border-gray-800 p-6">
