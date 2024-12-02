@@ -1,19 +1,12 @@
-'use client';
-
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { 
+import {
   FileText,
-  Loader,
   AlertCircle,
   FolderOpen,
   Link2,
-  Upload,
-  File,
   X,
   ExternalLink,
-  Clock,
-  ArrowUpRight,
   Eye
 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
@@ -122,6 +115,7 @@ export default function DocumentCategories() {
       fetchAndCategorizeDocuments();
     }
   }, [genAI]);
+
   const fetchAndCategorizeDocuments = async () => {
     setLoading(true);
     try {
@@ -134,11 +128,9 @@ export default function DocumentCategories() {
       });
 
       if (Array.isArray(response) && response.length > 0) {
-        // const docs = response[0];
         const userDocuments = response[0].filter(doc => doc.creator === account.address);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const categorizedResults: Document[] = [];
-
 
         for (const doc of userDocuments) {
           try {
@@ -183,9 +175,9 @@ export default function DocumentCategories() {
 
             const categoryPrompt = `
               Based on this document content, determine the appropriate category:
-              
+
               ${extractedContent}
-              
+
               Categories:
               - personal identity (for ID documents like Aadhaar, PAN card, passport)
               - legal (for contracts, agreements, legal notices)
@@ -235,7 +227,7 @@ export default function DocumentCategories() {
     }
   };
 
-  const openIPFSFile = async(cid: string) => {
+  const openIPFSFile = async (cid: string) => {
     const ipfsUrl = `https://ipfs.io/ipfs/${cid}`;
     window.open(ipfsUrl, '_blank');
   };
@@ -292,12 +284,12 @@ export default function DocumentCategories() {
                 {docs.map((doc) => {
                   const styles = STATUS_STYLES[doc.category as CategoryType || 'other'];
                   return (
-                    <div 
+                    <div
                       key={doc.id}
                       className={`group relative bg-gray-800/50 backdrop-blur-sm rounded-xl border ${styles.border} hover:shadow-lg transition-all duration-200`}
                     >
                       <div className={`absolute top-0 left-4 right-0 h-2 ${styles.bg} rounded-b-lg`} />
-                      
+
                       <div className="p-4 md:p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className={`w-10 h-10 rounded-lg ${styles.bg} flex items-center justify-center`}>
