@@ -62,7 +62,7 @@ const STATUS_STYLES = {
 const ACTIVE_TAB_STYLES = "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 border-l-2 border-emerald-500 text-white";
 
 export default function ContractManagement() {
-  const { account, signAndSubmitTransaction, connect, disconnect } = useWallet(); 
+  const { account, signAndSubmitTransaction, connect, disconnect, WalletName } = useWallet(); 
   const [activeTab, setActiveTab] = useState('recent');
   const [isGridView, setIsGridView] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -433,7 +433,7 @@ export default function ContractManagement() {
               </div>
               {!account ? (
                 <button 
-                  onClick={() => connect()}
+                  onClick={() => connect(WalletName)}
                   className="px-4 md:px-6 py-2 text-sm md:text-base rounded-lg bg-emerald-500 hover:bg-emerald-600 transition-colors"
                 >
                   Connect
