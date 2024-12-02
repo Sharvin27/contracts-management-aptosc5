@@ -220,7 +220,7 @@ export default function ContractManagement() {
       setFile(null);
       setSignersList([{ address: '' }]);
       fetchUserDocuments();
-      toast.custom((t) => (
+      toast.custom((_t) => (
         <div className="bg-gray-800 text-white px-6 py-4 shadow-xl rounded-lg border border-gray-700 animate-in slide-in-from-bottom-5">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
