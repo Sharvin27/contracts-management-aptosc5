@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { aptosClient } from "@/utils/aptosClient";
 import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
@@ -51,6 +51,11 @@ interface Signer {
   label?: string;
 }
 
+interface Window {
+  SpeechRecognition: any;
+  webkitSpeechRecognition: any;
+}
+
 const STATUS_STYLES = {
   completed: {
     bg: 'bg-emerald-500/10',
@@ -88,7 +93,7 @@ export default function ContractManagement() {
   const [aiPrompt, setAiPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef(null);
+  const recognitionRef = useRef<any>(null);
 
   const moduleAddress = process.env.VITE_APP_MODULE_ADDRESS;
   const moduleName = process.env.VITE_APP_MODULE_NAME;
@@ -98,21 +103,21 @@ export default function ContractManagement() {
   // Check if browser supports speech recognition
   const initSpeechRecognition = () => {
     const SpeechRecognition = 
-      window.SpeechRecognition || 
-      window.webkitSpeechRecognition;
+    (window as any).SpeechRecognition || 
+    (window as any).webkitSpeechRecognition;
 
     if (SpeechRecognition) {
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = false;
       recognitionRef.current.lang = 'en-US';
 
-      recognitionRef.current.onresult = (event) => {
+      recognitionRef.current.onresult = (event:any) => {
         const transcript = event.results[0][0].transcript;
         setAiPrompt(transcript);
         setIsListening(false);
       };
 
-      recognitionRef.current.onerror = (event) => {
+      recognitionRef.current.onerror = (event:any) => {
         console.error('Speech recognition error', event.error);
         setIsListening(false);
         toast.error('Voice input failed');

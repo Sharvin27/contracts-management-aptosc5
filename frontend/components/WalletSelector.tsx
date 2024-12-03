@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import { IoWallet } from "react-icons/io5";
+import { motion } from "framer-motion";
 
 
 export function WalletSelector() {
@@ -75,7 +76,22 @@ export function WalletSelector() {
   ) : (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button>Connect a Wallet</Button>
+      <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      className="px-8 py-3 rounded-lg font-medium relative group overflow-hidden"
+    >
+      {/* Gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600" />
+      
+      {/* Hover overlay */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-white" />
+      
+      {/* Button text */}
+      <span className="relative text-slate font-semibold">
+        Connect Wallet
+      </span>
+    </motion.button>
       </DialogTrigger>
       <ConnectWalletDialog close={closeDialog} />
     </Dialog>
