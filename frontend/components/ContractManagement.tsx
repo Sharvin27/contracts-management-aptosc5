@@ -51,11 +51,6 @@ interface Signer {
   label?: string;
 }
 
-interface Window {
-  SpeechRecognition: any;
-  webkitSpeechRecognition: any;
-}
-
 const STATUS_STYLES = {
   completed: {
     bg: 'bg-emerald-500/10',
@@ -103,8 +98,8 @@ export default function ContractManagement() {
   // Check if browser supports speech recognition
   const initSpeechRecognition = () => {
     const SpeechRecognition = 
-    (Window as any).SpeechRecognition || 
-    (Window as any).webkitSpeechRecognition;
+    (window as any).SpeechRecognition || 
+    (window as any).webkitSpeechRecognition;
 
     if (SpeechRecognition) {
       recognitionRef.current = new SpeechRecognition();
@@ -449,7 +444,7 @@ export default function ContractManagement() {
       link.parentNode?.removeChild(link);
       window.URL.revokeObjectURL(downloadUrl);
   
-      toast.custom((t) => (
+      toast.custom(() => (
         <div className="bg-gray-800 text-white px-6 py-4 shadow-xl rounded-lg border border-gray-700">
           <div className="flex items-center space-x-3">
             <FileDown className="w-5 h-5 text-emerald-400" />
