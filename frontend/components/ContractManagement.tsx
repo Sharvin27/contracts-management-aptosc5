@@ -1,10 +1,14 @@
- import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { aptosClient } from "@/utils/aptosClient";
 import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 import axios from 'axios';
 import { toast, Toaster } from 'react-hot-toast';
 import {WalletName}  from '@aptos-labs/wallet-adapter-react';
+import { Buffer } from 'buffer';
+
+import { AptosClient, AptosAccount, Types } from "aptos";
+
 import { 
   Clock, 
   Grid,  
@@ -17,8 +21,11 @@ import {
   Menu,
   Eye,
   Bot,
+  Mic, 
+  MicOff,
   Send,
   ExternalLink, 
+  FileDown,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
@@ -80,11 +87,59 @@ export default function ContractManagement() {
   const [signersList, setSignersList] = useState<Signer[]>([{ address: '' }]);
   const [aiPrompt, setAiPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef(null);
 
   const moduleAddress = process.env.VITE_APP_MODULE_ADDRESS;
   const moduleName = process.env.VITE_APP_MODULE_NAME;
 
   console.log(pendingDocuments)
+
+  // Check if browser supports speech recognition
+  const initSpeechRecognition = () => {
+    const SpeechRecognition = 
+      window.SpeechRecognition || 
+      window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setAiPrompt(transcript);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error', event.error);
+        setIsListening(false);
+        toast.error('Voice input failed');
+      };
+    } else {
+      toast.error('Speech recognition not supported');
+    }
+  };
+
+  const startListening = () => {
+    if (!recognitionRef.current) {
+      initSpeechRecognition();
+    }
+
+    if (recognitionRef.current) {
+      setIsListening(true);
+      recognitionRef.current.start();
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -298,13 +353,29 @@ export default function ContractManagement() {
     setIsProcessing(true);
     
     try {
-      const payload: InputTransactionData = {
-        data: {
-          function: `${moduleAddress}::${moduleName}::sign_document`,
-          functionArguments: [documentId],
-        }
+      // CRITICAL SECURITY NOTE: NEVER expose your private key directly in code
+      const privateKeyHex = '0x200169e8e0dc993447ee567d3423b83060640f567c09f1cf2ffb97e959ca8c2b'; // Store in environment variables
+      
+      if (!privateKeyHex) {
+        throw new Error('Private key is not configured');
+      }
+  
+      const client = new AptosClient('https://fullnode.testnet.aptoslabs.com');
+      const signingAccount = new AptosAccount(
+        Buffer.from(privateKeyHex.replace('0x', ''), 'hex')
+      );
+  
+      const payload: Types.TransactionPayload = {
+        type: "entry_function_payload",
+        function: `${moduleAddress}::${moduleName}::sign_document`,
+        type_arguments: [],
+        arguments: [documentId]
       };
-      await signAndSubmitTransaction(payload);
+  
+      const rawTxn = await client.generateTransaction(signingAccount.address(), payload);
+      const signedTxn = await client.signTransaction(signingAccount, rawTxn);
+      const transactionHash = await client.submitTransaction(signedTxn);
+  
       toast.custom((_t) => (
         <div className="bg-gray-800 text-white px-6 py-4 shadow-xl rounded-lg border border-gray-700">
           <div className="flex items-center space-x-3">
@@ -313,7 +384,9 @@ export default function ContractManagement() {
           </div>
         </div>
       ));
+  
       fetchUserDocuments();
+      return transactionHash;
     } catch (error) {
       console.error('Signing failed:', error);
       toast.error('Failed to sign document');
@@ -349,6 +422,42 @@ export default function ContractManagement() {
     window.open(URL.createObjectURL(response.data), '_blank');
   };
 
+  const downloadIPFSFile = async (cid: string, docId: number) => {
+    try {
+      const url = `https://gateway.pinata.cloud/ipfs/${cid}`;
+      const response = await axios.get(url, { responseType: 'blob' });
+      
+      // Create blob link and trigger download
+      const blob = new Blob([response.data]);
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', `document-${docId}.pdf`);
+      
+      // Append to html link element page
+      document.body.appendChild(link);
+      
+      // Start download
+      link.click();
+      
+      // Clean up and remove the link
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+  
+      toast.custom((t) => (
+        <div className="bg-gray-800 text-white px-6 py-4 shadow-xl rounded-lg border border-gray-700">
+          <div className="flex items-center space-x-3">
+            <FileDown className="w-5 h-5 text-emerald-400" />
+            <p>Document {docId} downloaded successfully</p>
+          </div>
+        </div>
+      ));
+    } catch (error) {
+      console.error("Error downloading document:", error);
+      toast.error("Failed to download document");
+    }
+  };
+
   const DocumentCard = ({ doc }: { doc: Document }) => {
     const status = doc.is_completed ? 'completed' : 'pending';
     const styles = STATUS_STYLES[status];
@@ -375,6 +484,15 @@ export default function ContractManagement() {
                 >
                   <Eye className="w-4 h-4" />
                 </button>
+                <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  downloadIPFSFile(doc.content_hash, doc.id);
+                }}
+                className="p-2 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                <FileDown className="w-4 h-4 text-white" />
+              </button>
                 <button 
                   onClick={(e) => {
                     e.preventDefault();
@@ -471,13 +589,26 @@ export default function ContractManagement() {
             </button>
           </div>
           <div className="flex flex-col md:flex-row items-center w-full max-w-md mx-auto mb-2 px-2">
-            <input
-              type="text"
-              value={aiPrompt}
-              onChange={(e) => setAiPrompt(e.target.value)}
-              placeholder="Ask AI to help..."
-              className="flex-1 px-3 py-2 bg-gray-800 rounded-lg border border-gray-700 focus:border-emerald-500 outline-none text-sm w-full md:w-auto"
-            />
+            <div className="relative flex-1 w-full">
+              <input
+                type="text"
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                placeholder="Ask AI to help..."
+                className="flex-1 px-3 py-2 pr-10 bg-gray-800 rounded-lg border border-gray-700 focus:border-emerald-500 outline-none text-sm w-full"
+              />
+              {/* Voice Input Button */}
+              <button
+                onClick={isListening ? stopListening : startListening}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-500"
+              >
+                {isListening ? (
+                  <MicOff className="w-4 h-4 text-red-500" />
+                ) : (
+                  <Mic className="w-4 h-4" />
+                )}
+              </button>
+            </div>
             <button
               onClick={executePrompt}
               disabled={isProcessing || !aiPrompt.trim()}

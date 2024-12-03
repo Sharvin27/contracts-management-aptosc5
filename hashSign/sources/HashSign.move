@@ -68,9 +68,9 @@ module HashSign::hash_sign_02 {
     // Create a new document
     public entry fun create_document(creator: &signer, content_hash: String, signers: vector<address>) acquires GlobalDocumentStore, EventStore {
         // Get the creator's address
-        let creator_address = std::signer::address_of(creator); // ASSIGNMENT #5
+        let creator_address = std::signer::address_of(creator); //  #5
         // Borrow a mutable reference to the GlobalDocumentStore
-        let store = borrow_global_mut<GlobalDocumentStore>(@HashSign); // ASSIGNMENT #6
+        let store = borrow_global_mut<GlobalDocumentStore>(@HashSign); //  #6
         // Borrow a mutable reference to the EventStore
         let event_store = borrow_global_mut<EventStore>(@HashSign);  
         
@@ -81,13 +81,13 @@ module HashSign::hash_sign_02 {
             // Store the provided content hash
             content_hash,
             // Store the creator's address  
-            creator: creator_address, // ASSIGNMENT #7
+            creator: creator_address, //  #7
             // Store the provided list of signers 
             signers,  
             // Initialize an empty vector for signatures
-            signatures: vector::empty(), // ASSIGNMENT #8
+            signatures: vector::empty(), //  #8
             // Set the document to false as not completed initially 
-            is_completed: false,  // ASSIGNMENT #9
+            is_completed: false,  //  #9
         };
 
         // Add the new document to the documents map
@@ -100,20 +100,20 @@ module HashSign::hash_sign_02 {
         });
 
         // Increment the document counter for the next document creation
-        store.document_counter = store.document_counter + 1; // ASSIGNMENT #10
+        store.document_counter = store.document_counter + 1; //  #10
     }
 
     // Sign a document
     public entry fun sign_document(signer: &signer, document_id: u64) acquires GlobalDocumentStore, EventStore {
         // Get the signer's address
-        let signer_address = std::signer::address_of(signer); // ASSIGNMENT #11
+        let signer_address = std::signer::address_of(signer); //  #11
         // Borrow a mutable reference to the GlobalDocumentStore
-        let store = borrow_global_mut<GlobalDocumentStore>(@HashSign); // ASSIGNMENT #12
+        let store = borrow_global_mut<GlobalDocumentStore>(@HashSign); //  #12
         // Borrow a mutable reference to the EventStore
         let event_store = borrow_global_mut<EventStore>(@HashSign);
         
         // Ensure the document_id is within bounds
-        assert!(simple_map::contains_key(&store.documents, &document_id), 3); // ASSIGNMENT #13
+        assert!(simple_map::contains_key(&store.documents, &document_id), 3); //  #13
 
         // Borrow a mutable reference to the document with the specified ID
         let document = simple_map::borrow_mut(&mut store.documents, &document_id);
@@ -140,7 +140,7 @@ module HashSign::hash_sign_02 {
         // Check if all signers have signed the document
         if (vector::length(&document.signatures) == vector::length(&document.signers)) {
             // If all signers have signed, mark the document as completed
-            document.is_completed = true; // ASSIGNMENT #14
+            document.is_completed = true; //  #14
         }
     }
 
