@@ -103,8 +103,8 @@ export default function ContractManagement() {
   // Check if browser supports speech recognition
   const initSpeechRecognition = () => {
     const SpeechRecognition = 
-    (window as any).SpeechRecognition || 
-    (window as any).webkitSpeechRecognition;
+    (Window as any).SpeechRecognition || 
+    (Window as any).webkitSpeechRecognition;
 
     if (SpeechRecognition) {
       recognitionRef.current = new SpeechRecognition();
@@ -307,9 +307,9 @@ export default function ContractManagement() {
   const handleShare = (docId: number) => {
     const signingLink = `${window.location.origin}/sign/${docId}`;
     navigator.clipboard.writeText(signingLink);
-    toast.custom((t) => (
+    toast.custom((_t) => (
       <div className={`${
-        t.visible ? 'animate-enter' : 'animate-leave'
+        _t.visible ? 'animate-enter' : 'animate-leave'
       } max-w-md w-full bg-gray-800 shadow-lg rounded-lg pointer-events-auto flex items-center justify-between p-4 gap-3 border border-gray-700`}>
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/20">
@@ -320,7 +320,7 @@ export default function ContractManagement() {
           </p>
         </div>
         <button
-          onClick={() => toast.dismiss(t.id)}
+          onClick={() => toast.dismiss(_t.id)}
           className="p-2 rounded-lg hover:bg-gray-700"
         >
           <X className="w-4 h-4" />
