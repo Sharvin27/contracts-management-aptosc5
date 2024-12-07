@@ -3,7 +3,6 @@ import {
   AboutAptosConnect,
   AboutAptosConnectEducationScreen,
   AnyAptosWallet,
-  AptosPrivacyPolicy,
   WalletItem,
   groupAndSortWallets,
   isAptosConnectWallet,
@@ -104,14 +103,15 @@ interface ConnectWalletDialogProps {
 
 function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
   const { wallets = [] } = useWallet();
-  const { aptosConnectWallets, availableWallets, installableWallets } = groupAndSortWallets(wallets);
+  //const { aptosConnectWallets, availableWallets, installableWallets } = groupAndSortWallets(wallets);
+  const { availableWallets, installableWallets } = groupAndSortWallets(wallets);
 
-  const hasAptosConnectWallets = !!aptosConnectWallets.length;
+  //const hasAptosConnectWallets = !!aptosConnectWallets.length;
 
   return (
     <DialogContent className="max-h-screen overflow-auto">
       <AboutAptosConnect renderEducationScreen={renderEducationScreen}>
-        <DialogHeader>
+        {/* <DialogHeader>
           <DialogTitle className="flex flex-col text-center leading-snug">
             {hasAptosConnectWallets ? (
               <>
@@ -122,9 +122,9 @@ function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
               "Connect Wallet"
             )}
           </DialogTitle>
-        </DialogHeader>
+        </DialogHeader> */}
 
-        {hasAptosConnectWallets && (
+        {/* {hasAptosConnectWallets && (
           <div className="flex flex-col gap-2 pt-3">
             {aptosConnectWallets.map((wallet) => (
               <AptosConnectWalletRow key={wallet.name} wallet={wallet} onConnect={close} />
@@ -149,21 +149,23 @@ function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
               <div className="h-px w-full bg-secondary" />
             </div>
           </div>
-        )}
+        )} */}
 
         <div className="flex flex-col gap-3 pt-3">
-          {availableWallets.map((wallet) => (
+          {availableWallets
+          .filter((wallet) => wallet.name === "Petra")
+          .map((wallet) => (
             <WalletRow key={wallet.name} wallet={wallet} onConnect={close} />
           ))}
           {!!installableWallets.length && (
             <Collapsible className="flex flex-col gap-3">
               <CollapsibleTrigger asChild>
                 <Button size="sm" variant="ghost" className="gap-2">
-                  More wallets <ChevronDown />
+                  Install wallet <ChevronDown />
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="flex flex-col gap-3">
-                {installableWallets.map((wallet) => (
+                {installableWallets.filter((wallet) => wallet.name === "Petra").map((wallet) => (
                   <WalletRow key={wallet.name} wallet={wallet} onConnect={close} />
                 ))}
               </CollapsibleContent>

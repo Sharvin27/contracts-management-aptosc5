@@ -588,14 +588,14 @@ export default function ContractManagement() {
               {!isSidebarCollapsed && <span>Upload</span>}
             </button>
           </div>
-          <div className="flex flex-col md:flex-row items-center w-full max-w-md mx-auto mb-2 px-2">
+          <div className="flex flex-col md:flex-row items-center md:w-full max-w-md mx-auto mb-2 px-4">
             <div className="relative flex-1 w-full">
               <input
                 type="text"
                 value={aiPrompt}
                 onChange={(e) => setAiPrompt(e.target.value)}
                 placeholder="Ask AI to help..."
-                className="flex-1 px-3 py-2 pr-10 bg-gray-800 rounded-lg border border-gray-700 focus:border-emerald-500 outline-none text-sm w-full"
+                className="flex-1 px-3 py-2 md:pr-10 bg-gray-800 rounded-lg border border-gray-700 focus:border-emerald-500 outline-none text-sm w-full"
               />
               {/* Voice Input Button */}
               <button
@@ -612,7 +612,7 @@ export default function ContractManagement() {
             <button
               onClick={executePrompt}
               disabled={isProcessing || !aiPrompt.trim()}
-              className="p-2 bg-emerald-500 rounded-lg hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed mt-2 md:mt-0 md:ml-2"
+              className="p-3 bg-emerald-500 rounded-lg hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed mt-2 md:mt-0 md:ml-2"
             >
               {isProcessing ? (
                 <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
