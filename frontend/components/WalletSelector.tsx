@@ -206,18 +206,18 @@ function WalletRow({ wallet, onConnect }: WalletRowProps) {
   );
 }
 
-function AptosConnectWalletRow({ wallet, onConnect }: WalletRowProps) {
-  return (
-    <WalletItem wallet={wallet} onConnect={onConnect}>
-      <WalletItem.ConnectButton asChild>
-        <Button size="lg" variant="outline" className="w-full gap-4">
-          <WalletItem.Icon className="h-5 w-5" />
-          <WalletItem.Name className="text-base font-normal" />
-        </Button>
-      </WalletItem.ConnectButton>
-    </WalletItem>
-  );
-}
+// function AptosConnectWalletRow({ wallet, onConnect }: WalletRowProps) {
+//   return (
+//     <WalletItem wallet={wallet} onConnect={onConnect}>
+//       <WalletItem.ConnectButton asChild>
+//         <Button size="lg" variant="outline" className="w-full gap-4">
+//           <WalletItem.Icon className="h-5 w-5" />
+//           <WalletItem.Name className="text-base font-normal" />
+//         </Button>
+//       </WalletItem.ConnectButton>
+//     </WalletItem>
+//   );
+// }
 
 function renderEducationScreen(screen: AboutAptosConnectEducationScreen) {
   return (
