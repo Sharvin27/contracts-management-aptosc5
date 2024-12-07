@@ -18,6 +18,7 @@ import {
   MoreVertical,
   FileText, 
   X, 
+  LogOut,
   Menu,
   Eye,
   Bot,
@@ -648,13 +649,14 @@ export default function ContractManagement() {
               ) : (
                 <div className="flex items-center space-x-3">
                   <Button className="hidden md:inline text-sm text-white bg-emerald-500 hover:bg-emerald-600">
-                    {`${account.address.slice(0, 6)}...${account.address.slice(-4)}`}
+                    {`${account.address.slice(0, 6)}...${account.address.slice(-5)}`}
                   </Button>
                   <button
                     onClick={() => disconnect()}
-                    className="p-2 rounded-lg hover:bg-gray-800"
+                    className="p-2 rounded-lg hover:bg-gray-800 flex items-center border-2 border-emerald-400"
                   >
-                    <X className="w-4 h-4" />
+                    <p className='hidden md:inline'>Disconnect</p>
+                    <LogOut className="w-4 h-4 md:ml-2" />
                   </button>
                 </div>
               )}
