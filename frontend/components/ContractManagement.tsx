@@ -537,7 +537,7 @@ export default function ContractManagement() {
           {/* Navigation */}
           <div className="px-4 py-6">
             <div className="flex items-center justify-between">
-              {!isSidebarCollapsed && <h2 className="text-2xl font-bold flex items-center"><IoDocumentLockOutline className='h-7 w-7 mx-2' />Decrypt Docs</h2>}
+              {!isSidebarCollapsed && <h2 className="text-2xl font-bold flex items-center"><IoDocumentLockOutline className='text-emerald-400 h-7 w-7 mx-2' />Decrypt Docs</h2>}
               {isMobile && (
                 <button
                   onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -582,7 +582,7 @@ export default function ContractManagement() {
             <button 
               onClick={() => setIsModalOpen(true)}
               className={`w-full bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors flex items-center justify-center space-x-2 ${
-                isSidebarCollapsed ? 'p-3' : 'px-4 py-3'
+                isSidebarCollapsed ? 'p-2 md:p-3' : 'px-3 py-3'
               }`}
             >
               <Upload className="w-4 h-4" />
@@ -655,8 +655,8 @@ export default function ContractManagement() {
                     onClick={() => disconnect()}
                     className="p-2 rounded-lg hover:bg-gray-800 flex items-center border-2 border-emerald-400"
                   >
-                    <p className='hidden md:inline'>Disconnect</p>
-                    <LogOut className="w-4 h-4 md:ml-2" />
+                    <p className='hidden md:inline text-emerald-400'>Disconnect</p>
+                    <LogOut className="w-4 h-4 md:ml-2 text-emerald-400" />
                   </button>
                 </div>
               )}
